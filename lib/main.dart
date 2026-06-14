@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 void main() {
   runApp(const MyApp());
 }
@@ -49,11 +50,39 @@ class _HomePageState extends State<HomePage> {
   const WaterPage(),
   MedicinesPage(
     medicines: medicines,
+    saveMedicines: saveMedicines,
   ),
   const VisitsPage(),
   const HistoryPage(),
 ];
+   @override
+void initState() {
+  super.initState();
+  loadMedicines();
+}
+  Future<void> loadMedicines() async {
+  final prefs = await SharedPreferences.getInstance();
 
+  final String? savedData = prefs.getString('medicines');
+
+  if (savedData != null) {
+    final List decoded = jsonDecode(savedData);
+
+    setState(() {
+      medicines = decoded
+          .map((item) => Map<String, dynamic>.from(item))
+          .toList();
+    });
+  }
+}
+  Future<void> saveMedicines() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  await prefs.setString(
+    'medicines',
+    jsonEncode(medicines),
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,10 +123,12 @@ class _HomePageState extends State<HomePage> {
 
 class MedicinesPage extends StatefulWidget {
   final List<Map<String, dynamic>> medicines;
+  final Future<void> Function() saveMedicines;
 
   const MedicinesPage({
     super.key,
     required this.medicines,
+    required this.saveMedicines,
   });
 
   @override
@@ -170,6 +201,57 @@ class _MedicinesPageState extends State<MedicinesPage> {
       ),
     );
   }
+  void editMedicine(Map<String, dynamic> medicine) {
+  TextEditingController nameController =
+      TextEditingController(text: medicine["name"]);
+
+  TextEditingController hourController =
+      TextEditingController(text: medicine["hour"]);
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Edytuj lek"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: nameController,
+            decoration: const InputDecoration(
+              labelText: "Nazwa leku",
+            ),
+          ),
+
+          TextField(
+            controller: hourController,
+            decoration: const InputDecoration(
+              labelText: "Godzina",
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Anuluj"),
+        ),
+
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              medicine["name"] = nameController.text;
+              medicine["hour"] = hourController.text;
+            });
+
+            Navigator.pop(context);
+          },
+          child: const Text("Zapisz"),
+        ),
+      ],
+    ),
+  );
+}
+  
 
   String getMedicineStatus(Map<String, dynamic> medicine) {
     if (medicine["taken"] == true) {
@@ -291,16 +373,51 @@ class _MedicinesPageState extends State<MedicinesPage> {
                 ],
               ),
             ),
-            ElevatedButton(
-              onPressed: medicine["taken"]
-                  ? null
-                  : () {
-                      setState(() {
-                        medicine["taken"] = true;
-                      });
-                    },
-              child: const Text("Przyjęto"),
-            ),
+            Column(
+  children: [
+    ElevatedButton(
+      onPressed: medicine["taken"]
+          ? null
+          : () {
+              setState(() {
+                medicine["taken"] = true;
+              });
+            },
+      child: Text(
+        medicine["taken"]
+            ? "Przyjęto"
+            : "Potwierdź",
+      ),
+    ),
+
+    Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(
+            Icons.edit,
+            color: Colors.blue,
+          ),
+          onPressed: () {
+            editMedicine(medicine);
+          },
+        ),
+
+        IconButton(
+          icon: const Icon(
+            Icons.delete,
+            color: Colors.red,
+          ),
+          onPressed: () {
+            setState(() {
+              widget.medicines.remove(medicine);
+            });
+          },
+        ),
+      ],
+    ),
+  ],
+),
           ],
         ),
       ),
