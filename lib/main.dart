@@ -1,3 +1,4 @@
+import 'profil.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -472,18 +473,3 @@ class HistoryPage extends StatelessWidget {
   }
 }
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          "Profil użytkownika",
-          style: TextStyle(fontSize: 30),
-        ),
-      ),
-    );
-  }
-}
