@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 void main() {
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: const Color(0xFFE91E63),
+        textTheme: GoogleFonts.poppinsTextTheme(),
         scaffoldBackgroundColor: const Color.fromARGB(255, 255, 252, 253),
         fontFamily: 'Segoe UI',
       ),
@@ -299,11 +301,12 @@ class _MedicinesPageState extends State<MedicinesPage> {
         backgroundColor: const Color(0xFFE91E63),
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
+        title: Text(
           "Moje leki",
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w800,
+          style: GoogleFonts.poppins(
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
             letterSpacing: 1,
             ),
           ),
@@ -373,9 +376,10 @@ class _MedicinesPageState extends State<MedicinesPage> {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(
+                    style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w700,
                       fontSize: 24,
+                      color: Colors.black87,
                       letterSpacing: 0.3,
                     ),
                   ),
@@ -394,13 +398,14 @@ class _MedicinesPageState extends State<MedicinesPage> {
                         : status == "Do przyjęcia"
                             ? "🔴 Do przyjęcia"
                             : "🟡 Oczekuje",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: status == "Przyjęto"
                           ? Colors.green
                           : status == "Do przyjęcia"
                               ? Colors.red
                               : Colors.orange,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                 ],
