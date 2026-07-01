@@ -1,3 +1,4 @@
+import 'ekrany/profil_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -519,18 +520,3 @@ class HistoryPage extends StatelessWidget {
   }
 }
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          "Profil użytkownika",
-          style: TextStyle(fontSize: 30),
-        ),
-      ),
-    );
-  }
-}

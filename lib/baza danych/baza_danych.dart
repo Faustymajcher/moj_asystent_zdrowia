@@ -1,7 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../modele/wizyta.dart';
+import 'modele/wizyta.dart';
 
 class BazaDanych {
   static final BazaDanych instance = BazaDanych._init();
