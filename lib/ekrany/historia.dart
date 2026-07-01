@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../baza/baza_danych.dart';
+import '../baza/woda_storage.dart';
 import '../modele/wizyta.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -11,7 +12,6 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  // Trzy zmienne na dane z różnych tabel
   Future<List<Map<String, dynamic>>>? _historiaWody;
   Future<List<Map<String, dynamic>>>? _historiaLekow;
   Future<List<Wizyta>>? _historiaWizyt;
@@ -26,14 +26,14 @@ class _HistoryPageState extends State<HistoryPage> {
     setState(() {
       _historiaWody = BazaDanych.instance.pobierzHistorieWody();
       //_historiaLekow = BazaDanych.instance.pobierzHistorieLekow();
-      _historiaWizyt = BazaDanych.instance.pobierzWizyty(); // Pobiera listę wszystkich wizyt
+      _historiaWizyt = BazaDanych.instance.pobierzWizyty();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Ile mamy zakładek w menu
+      length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFFFFF5F8),
         appBar: AppBar(
@@ -42,7 +42,6 @@ class _HistoryPageState extends State<HistoryPage> {
           backgroundColor: const Color(0xFFE91E63),
           foregroundColor: Colors.white,
           elevation: 0,
-          // Pasek zakładek
           bottom: const TabBar(
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
@@ -90,12 +89,52 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Icon(Icons.water_drop, color: Colors.white)
                 ),
                 title: Text("Data: ${wiersz['data']}", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-                trailing: Text("${wiersz['suma']} ml", style: GoogleFonts.poppins(fontSize: 18, color: const Color(0xFF0288D1), fontWeight: FontWeight.bold)),
+                subtitle: Text("${wiersz['suma']} ml", style: GoogleFonts.poppins(fontSize: 18, color: const Color(0xFF0288D1), fontWeight: FontWeight.bold)),
+                trailing: IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.grey),
+                  onPressed: () {
+                    _pokazDialogEdycjiWody(wiersz['data'], (wiersz['suma'] as num).toInt());
+                  },
+                ),
               ),
             );
           },
         );
       },
+    );
+  }
+
+  void _pokazDialogEdycjiWody(String data, int aktualnaSuma) {
+    TextEditingController kontroler = TextEditingController(text: aktualnaSuma.toString());
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Edytuj wpis z $data"),
+        content: TextField(
+          controller: kontroler,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: "Nowa suma wody (ml)",
+            suffixText: "ml",
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Anuluj"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              int nowaSuma = int.tryParse(kontroler.text) ?? aktualnaSuma;
+              await WodaStorage.instance.aktualizujWodeZDanegoDnia(data, nowaSuma);
+              Navigator.pop(context);
+              _pobierzWszystkieDane();
+            },
+            child: const Text("Zapisz"),
+          ),
+        ],
+      ),
     );
   }
 

@@ -1,7 +1,7 @@
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:moj_asystent_zdrowia/baza/profile_storage.dart';
 import 'package:moj_asystent_zdrowia/modele/user_profile.dart';
+import 'package:moj_asystent_zdrowia/baza/profile_storage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
