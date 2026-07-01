@@ -1,14 +1,12 @@
-import 'ekrany/profil_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+
+import 'ekrany/profil_screen.dart';
 import 'ekrany/wizyty.dart';
-
-
 import 'ekrany/woda.dart';
 import 'ekrany/historia.dart';
-
 
 void main() {
   runApp(const MyApp());
@@ -77,7 +75,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> saveMedicines() async {
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.setString('medicines', jsonEncode(medicines));
   }
 
@@ -87,7 +84,7 @@ class _HomePageState extends State<HomePage> {
       const ProfilePage(),
       const WaterPage(),
       MedicinesPage(medicines: medicines, saveMedicines: saveMedicines),
-      const WizytyPage(),
+      const Wizyty(),
       const HistoryPage(),
     ];
 
@@ -155,9 +152,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
               controller: nameController,
               decoration: const InputDecoration(labelText: "Nazwa leku"),
             ),
-
             const SizedBox(height: 15),
-
             ElevatedButton(
               onPressed: () async {
                 final picked = await showTimePicker(
@@ -167,7 +162,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
 
                 if (picked != null) {
                   selectedTime = picked;
-
                   hourController.text =
                       "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
                 }
@@ -206,7 +200,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
     TextEditingController nameController = TextEditingController(
       text: medicine["name"],
     );
-
     TextEditingController hourController = TextEditingController(
       text: medicine["hour"],
     );
@@ -222,7 +215,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
               controller: nameController,
               decoration: const InputDecoration(labelText: "Nazwa leku"),
             ),
-
             TextField(
               controller: hourController,
               decoration: const InputDecoration(labelText: "Godzina"),
@@ -234,7 +226,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
             onPressed: () => Navigator.pop(context),
             child: const Text("Anuluj"),
           ),
-
           ElevatedButton(
             onPressed: () {
               setState(() {
@@ -257,7 +248,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
     }
 
     final now = TimeOfDay.now();
-
     final parts = medicine["hour"].split(":");
     final medicineHour = int.parse(parts[0]);
     final medicineMinute = int.parse(parts[1]);
@@ -401,7 +391,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                   ),
                   onPressed: medicine["taken"]
                       ? null
-                      : () {
+                      : () async {
                           setState(() {
                             medicine["taken"] = true;
                           });
@@ -409,7 +399,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
                         },
                   child: Text(medicine["taken"] ? "Przyjęto" : "Potwierdź"),
                 ),
-
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -419,7 +408,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
                         editMedicine(medicine);
                       },
                     ),
-
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () {
@@ -436,40 +424,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class WaterPage extends StatelessWidget {
-  const WaterPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text("Nawodnienie", style: TextStyle(fontSize: 30))),
-    );
-  }
-}
-
-
-class VisitsPage extends StatelessWidget {
-  const VisitsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text("Wizyty", style: TextStyle(fontSize: 30))),
-    );
-  }
-}
-
-class HistoryPage extends StatelessWidget {
-  const HistoryPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text("Historia", style: TextStyle(fontSize: 30))),
     );
   }
 }
