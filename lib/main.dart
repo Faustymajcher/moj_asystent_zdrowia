@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+
+import 'ekrany/woda.dart';
+import 'ekrany/historia.dart';
+
+
 void main() {
   runApp(const MyApp());
 }
@@ -471,21 +476,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
     );
   }
 }
-class WaterPage extends StatelessWidget {
-  const WaterPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          "Nawodnienie",
-          style: TextStyle(fontSize: 30),
-        ),
-      ),
-    );
-  }
-}
 
 class VisitsPage extends StatelessWidget {
   const VisitsPage({super.key});
@@ -503,21 +494,6 @@ class VisitsPage extends StatelessWidget {
   }
 }
 
-class HistoryPage extends StatelessWidget {
-  const HistoryPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          "Historia",
-          style: TextStyle(fontSize: 30),
-        ),
-      ),
-    );
-  }
-}
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
