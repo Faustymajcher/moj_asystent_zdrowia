@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
       const ProfilePage(),
       const WaterPage(),
       MedicinesPage(medicines: medicines, saveMedicines: saveMedicines),
-      const Wizyty(),
+      const WizytyPage(),
       const HistoryPage(),
     ];
 

@@ -1,158 +1,155 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import '../modele/wizyta.dart';
 import '../baza/baza_danych.dart';
 
-class Wizyty extends StatefulWidget {
-  const Wizyty({super.key});
+class WizytyPage extends StatefulWidget {
+  const WizytyPage({super.key});
 
   @override
-  State<Wizyty> createState() {
-    return _WizytyState();
-  }
+  State<WizytyPage> createState() => _WizytyPageState();
 }
 
-class _WizytyState extends State<Wizyty> {
-  DateTime _wybranyDzien = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
-  final TextEditingController _lekarzController = TextEditingController();
-  final TextEditingController _miejsceController = TextEditingController();
-  final TextEditingController _notatkiController = TextEditingController();
+class _WizytyPageState extends State<WizytyPage> {
+  final lekarzCtrl = TextEditingController();
+  final miejsceCtrl = TextEditingController();
+  final notatkiCtrl = TextEditingController();
 
-  List<Wizyta> _wizyty = [];
+  DateTime? wybranaData;
+  List<Wizyta> wizyty = [];
+
+  @override
+  void initState() {
+    super.initState();
+    zaladujWizyty();
+  }
+
+  Future<void> zaladujWizyty() async {
+    final dane = await BazaDanych.instance.pobierzWizyty();
+    setState(() {
+      wizyty = dane;
+    });
+  }
+
+  Future<void> wybierzDate() async {
+    final data = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+      initialDate: DateTime.now(),
+    );
+
+    if (data != null) {
+      setState(() {
+        wybranaData = data;
+      });
+    }
+  }
+
+  Future<void> dodajWizyte() async {
+    if (wybranaData == null) return;
+
+    final wizyta = Wizyta(
+      data: wybranaData!,
+      lekarz: lekarzCtrl.text,
+      miejsce: miejsceCtrl.text,
+      notatki: notatkiCtrl.text,
+    );
+
+    await BazaDanych.instance.dodajWizyte(wizyta);
+
+    lekarzCtrl.clear();
+    miejsceCtrl.clear();
+    notatkiCtrl.clear();
+    wybranaData = null;
+
+    zaladujWizyty();
+  }
+
+  Future<void> usun(int id) async {
+    await BazaDanych.instance.usunWizyte(id);
+    zaladujWizyty();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Wizyty lekarskie")),
-      body: _buildBody(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _dodajWizyte();
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildBody() {
-    return Column(
-      children: [
-        TableCalendar(
-          firstDay: DateTime.utc(2024, 1, 1),
-          lastDay: DateTime.utc(2035, 12, 31),
-          focusedDay: _focusedDay,
-          selectedDayPredicate: (day) {
-            return isSameDay(_wybranyDzien, day);
-          },
-          onDaySelected: (selectedDay, focusedDay) async {
-            setState(() {
-              _wybranyDzien = selectedDay;
-              _focusedDay = focusedDay;
-            });
-
-            final wizyty = await BazaDanych.instance.pobierzWizytyZDnia(
-              selectedDay,
-            );
-
-            if (!mounted) return;
-
-            setState(() {
-              _wizyty = wizyty;
-            });
-          },
-        ),
-
-        const SizedBox(height: 10),
-
-        Expanded(
-          child: _wizyty.isEmpty
-              ? const Center(child: Text("Brak wizyt tego dnia"))
-              : ListView.builder(
-                  itemCount: _wizyty.length,
-                  itemBuilder: (context, index) {
-                    final w = _wizyty[index];
-
-                    return Card(
-                      child: ListTile(
-                        title: Text(w.lekarz),
-                        subtitle: Text("${w.miejsce}\n${w.notatki}"),
-                        isThreeLine: true,
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () async {
-                            await BazaDanych.instance.usunWizyte(w.id!);
-
-                            _wizyty = await BazaDanych.instance
-                                .pobierzWizytyZDnia(_wybranyDzien);
-
-                            setState(() {});
-                          },
-                        ),
-                      ),
-                    );
-                  },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                TextField(
+                  controller: lekarzCtrl,
+                  decoration: const InputDecoration(labelText: "Lekarz"),
                 ),
-        ),
-      ],
-    );
-  }
+                TextField(
+                  controller: miejsceCtrl,
+                  decoration: const InputDecoration(labelText: "Miejsce"),
+                ),
+                TextField(
+                  controller: notatkiCtrl,
+                  decoration: const InputDecoration(labelText: "Notatki"),
+                ),
 
-  void _dodajWizyte() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Dodaj wizytę"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _lekarzController,
-                decoration: const InputDecoration(labelText: "Lekarz"),
-              ),
-              TextField(
-                controller: _miejsceController,
-                decoration: const InputDecoration(labelText: "Miejsce"),
-              ),
-              TextField(
-                controller: _notatkiController,
-                decoration: const InputDecoration(labelText: "Notatki"),
-              ),
-            ],
+                const SizedBox(height: 10),
+
+                Row(
+                  children: [
+                    Text(
+                      wybranaData == null
+                          ? "Nie wybrano daty"
+                          : wybranaData!.toString().split(" ")[0],
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: wybierzDate,
+                      child: const Text("Wybierz datę"),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                ElevatedButton(
+                  onPressed: dodajWizyte,
+                  child: const Text("Dodaj wizytę"),
+                ),
+              ],
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Anuluj"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final wizyta = Wizyta(
-                  data: _wybranyDzien,
-                  lekarz: _lekarzController.text,
-                  miejsce: _miejsceController.text,
-                  notatki: _notatkiController.text,
+
+          const Divider(),
+
+          Expanded(
+            child: ListView.builder(
+              itemCount: wizyty.length,
+              itemBuilder: (context, index) {
+                final w = wizyty[index];
+
+                return Card(
+                  child: ListTile(
+                    title: Text(w.lekarz),
+                    subtitle: Text(
+                      "${w.miejsce}\n${w.data.toString().split(' ')[0]}\n${w.notatki}",
+                    ),
+                    isThreeLine: true,
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        if (w.id != null) {
+                          usun(w.id!);
+                        }
+                      },
+                    ),
+                  ),
                 );
-
-                await BazaDanych.instance.dodajWizyte(wizyta);
-
-                Navigator.of(context).pop();
-
-                _lekarzController.clear();
-                _miejsceController.clear();
-                _notatkiController.clear();
-
-                _wizyty = await BazaDanych.instance.pobierzWizytyZDnia(
-                  _wybranyDzien,
-                );
-
-                setState(() {});
               },
-              child: const Text("Zapisz"),
             ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
     );
   }
 }
