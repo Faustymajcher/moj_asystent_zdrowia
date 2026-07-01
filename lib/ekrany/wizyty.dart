@@ -22,7 +22,6 @@ class _WizytyState extends State<Wizyty> {
   List<Wizyta> _wizyty = [];
   @override
   Widget build(BuildContext context) {
-    int myIndex = 4;
     return Scaffold(
       appBar: AppBar(title: const Text("Wizyty lekarskie")),
       body: _buildBody(),
@@ -46,12 +45,20 @@ class _WizytyState extends State<Wizyty> {
             return isSameDay(_wybranyDzien, day);
           },
           onDaySelected: (selectedDay, focusedDay) async {
-            _wybranyDzien = selectedDay;
-            _focusedDay = focusedDay;
+            setState(() {
+              _wybranyDzien = selectedDay;
+              _focusedDay = focusedDay;
+            });
 
-            _wizyty = await BazaDanych.instance.pobierzWizytyZDnia(selectedDay);
+            final wizyty = await BazaDanych.instance.pobierzWizytyZDnia(
+              selectedDay,
+            );
 
-            setState(() {});
+            if (!mounted) return;
+
+            setState(() {
+              _wizyty = wizyty;
+            });
           },
         ),
 
@@ -129,6 +136,8 @@ class _WizytyState extends State<Wizyty> {
 
                 await BazaDanych.instance.dodajWizyte(wizyta);
 
+                Navigator.of(context).pop();
+
                 _lekarzController.clear();
                 _miejsceController.clear();
                 _notatkiController.clear();
@@ -138,8 +147,6 @@ class _WizytyState extends State<Wizyty> {
                 );
 
                 setState(() {});
-
-                Navigator.pop(context);
               },
               child: const Text("Zapisz"),
             ),
