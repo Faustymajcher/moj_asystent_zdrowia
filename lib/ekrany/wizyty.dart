@@ -241,9 +241,10 @@ class _WizytyPageState extends State<WizytyPage> {
         backgroundColor: const Color(0xFFE91E63),
         foregroundColor: Colors.white,
         title: Text(
-          "Moje wizyty",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+          "Nawodnienie",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 32),
         ),
+        centerTitle: true,
       ),
 
       floatingActionButton: FloatingActionButton(
