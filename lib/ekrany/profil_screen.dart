@@ -61,7 +61,6 @@ class _ProfilePageState extends State<ProfilePage> {
       weightController.text = data['weight'] ?? '';
       bloodController.text = data['blood'] ?? '';
       waterResult = water;
-
       // Oblicz BMI przy ładowaniu profilu, jeśli dane istnieją
       final double? w = double.tryParse(weightController.text);
       final double? h = double.tryParse(heightController.text);
@@ -94,6 +93,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (weight != null && age != null) {
       water = calculateWaterIntake(weight: weight, age: age);
+    }
+
+    if (weight != null && height != null && height > 0) {
+      calculatedBmi = calculateBMI(
+        weight: weight,
+        height: height,
+      ).toStringAsFixed(1);
     }
 
     if (weight != null && height != null && height > 0) {
