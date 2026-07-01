@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:moj_asystent_zdrowia/ekrany/wizyty.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'ekrany/profil_screen.dart';
-import 'ekrany/wizyty.dart';
 import 'ekrany/woda.dart';
 import 'ekrany/historia.dart';
 
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
       const ProfilePage(),
       const WaterPage(),
       MedicinesPage(medicines: medicines, saveMedicines: saveMedicines),
-      const Wizyty(),
+      WizytyPage(),
       const HistoryPage(),
     ];
 

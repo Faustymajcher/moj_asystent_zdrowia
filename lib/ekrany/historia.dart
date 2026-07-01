@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../baza danych/baza_danych.dart';
+import '../baza/baza_danych.dart';
 import '../modele/wizyta.dart';
 
 class HistoryPage extends StatefulWidget {
