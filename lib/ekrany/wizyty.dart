@@ -135,6 +135,94 @@ class _WizytyPageState extends State<WizytyPage> {
     );
   }
 
+  void editVisit(Wizyta wizyta) {
+    final lekarz = TextEditingController(text: wizyta.lekarz);
+    final miejsce = TextEditingController(text: wizyta.miejsce);
+    final notatki = TextEditingController(text: wizyta.notatki);
+    DateTime? data = wizyta.data;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) {
+          return AlertDialog(
+            title: const Text("Edytuj wizytę"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: lekarz,
+                  decoration: const InputDecoration(labelText: "Lekarz"),
+                ),
+                TextField(
+                  controller: miejsce,
+                  decoration: const InputDecoration(labelText: "Miejsce"),
+                ),
+                TextField(
+                  controller: notatki,
+                  decoration: const InputDecoration(labelText: "Notatki"),
+                ),
+
+                const SizedBox(height: 10),
+
+                ElevatedButton(
+                  onPressed: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2100),
+                      initialDate: data ?? DateTime.now(),
+                    );
+
+                    if (picked != null) {
+                      setStateDialog(() => data = picked);
+                    }
+                  },
+                  child: const Text("Zmień datę"),
+                ),
+
+                Text(
+                  data == null ? "Brak daty" : data.toString().split(" ")[0],
+                ),
+              ],
+            ),
+
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Anuluj"),
+              ),
+
+              ElevatedButton(
+                onPressed: () async {
+                  if (data == null) return;
+
+                  setState(() {
+                    final index = wizyty.indexWhere((e) => e.id == wizyta.id);
+
+                    if (index != -1) {
+                      wizyty[index] = Wizyta(
+                        id: wizyta.id,
+                        lekarz: lekarz.text,
+                        miejsce: miejsce.text,
+                        data: data!,
+                        notatki: notatki.text,
+                      );
+                    }
+                  });
+
+                  await save();
+                  Navigator.pop(context);
+                },
+                child: const Text("Zapisz"),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   Future delete(int id) async {
     wizyty.removeWhere((w) => w.id == id);
     await save();
@@ -205,6 +293,13 @@ class _WizytyPageState extends State<WizytyPage> {
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit_outlined,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () => editVisit(w),
                               ),
 
                               IconButton(
