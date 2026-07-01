@@ -29,7 +29,7 @@ class Wizyta {
       data: DateTime.parse(map['data']),
       lekarz: map['lekarz'],
       miejsce: map['miejsce'],
-      notatki: map['notatki'],
+      notatki: map['notatki'] ?? "",
     );
   }
 }
