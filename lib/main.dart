@@ -1,5 +1,6 @@
 import 'profil.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 void main() {
@@ -15,8 +16,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Mój Asystent Zdrowia',
       theme: ThemeData(
-        colorSchemeSeed: const Color.fromARGB(255, 245, 3, 120),
         useMaterial3: true,
+        colorSchemeSeed: const Color(0xFFE91E63),
+        textTheme: GoogleFonts.poppinsTextTheme(),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 255, 252, 253),
+        fontFamily: 'Segoe UI',
       ),
       home: const HomePage(),
     );
@@ -33,59 +37,73 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 2;
 
-  List<Map<String, dynamic>> medicines = [
-  {
-    "name": "Ibuprofen 200 mg",
-    "hour": "18:00",
-    "taken": false,
-  },
-  {
-    "name": "Witamina D",
-    "hour": "20:00",
-    "taken": false,
-  },
-];
+  List<Map<String, dynamic>> medicines = [];
 
-  List<Widget> get pages => [
-  const ProfilePage(),
-  const WaterPage(),
-  MedicinesPage(
-    medicines: medicines,
-    saveMedicines: saveMedicines,
-  ),
-  const VisitsPage(),
-  const HistoryPage(),
-];
-   @override
-void initState() {
-  super.initState();
-  loadMedicines();
-}
-  Future<void> loadMedicines() async {
-  final prefs = await SharedPreferences.getInstance();
-
-  final String? savedData = prefs.getString('medicines');
-
-  if (savedData != null) {
-    final List decoded = jsonDecode(savedData);
-
-    setState(() {
-      medicines = decoded
-          .map((item) => Map<String, dynamic>.from(item))
-          .toList();
-    });
+  @override
+  void initState() {
+    super.initState();
+    loadMedicines();
   }
-}
-  Future<void> saveMedicines() async {
-  final prefs = await SharedPreferences.getInstance();
 
-  await prefs.setString(
-    'medicines',
-    jsonEncode(medicines),
-  );
-}
+  Future<void> loadMedicines() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final String? savedData =
+        prefs.getString('medicines');
+
+    if (savedData != null) {
+      final List decoded =
+          jsonDecode(savedData);
+
+      setState(() {
+        medicines = decoded
+            .map(
+              (item) =>
+                  Map<String, dynamic>.from(item),
+            )
+            .toList();
+      });
+    } else {
+      medicines = [
+        {
+          "name": "Ibuprofen 200 mg",
+          "hour": "18:00",
+          "taken": false,
+        },
+        {
+          "name": "Witamina D",
+          "hour": "20:00",
+          "taken": false,
+        },
+      ];
+
+      await saveMedicines();
+    }
+  }
+
+  Future<void> saveMedicines() async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      'medicines',
+      jsonEncode(medicines),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      const ProfilePage(),
+      const WaterPage(),
+      MedicinesPage(
+        medicines: medicines,
+        saveMedicines: saveMedicines,
+      ),
+      const VisitsPage(),
+      const HistoryPage(),
+    ];
+
     return Scaffold(
       body: pages[selectedIndex],
       bottomNavigationBar: NavigationBar(
@@ -193,7 +211,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                   "taken": false,
                 });
               });
-
+              widget.saveMedicines();
               Navigator.pop(context);
             },
             child: const Text("Dodaj"),
@@ -243,7 +261,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
               medicine["name"] = nameController.text;
               medicine["hour"] = hourController.text;
             });
-
+            widget.saveMedicines();
             Navigator.pop(context);
           },
           child: const Text("Zapisz"),
@@ -278,12 +296,22 @@ class _MedicinesPageState extends State<MedicinesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F7F8),
+      backgroundColor: const Color(0xFFFFF5F8),
       appBar: AppBar(
-        backgroundColor: Colors.teal,
+        centerTitle: true,
+        backgroundColor: const Color(0xFFE91E63),
         foregroundColor: Colors.white,
-        title: const Text("Moje leki"),
-      ),
+        elevation: 0,
+        title: Text(
+          "Moje leki",
+          style: GoogleFonts.poppins(
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: 1,
+            ),
+          ),
+        ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView.builder(
@@ -328,9 +356,10 @@ class _MedicinesPageState extends State<MedicinesPage> {
     final status = getMedicineStatus(medicine);
 
     return Card(
-      elevation: 5,
+      elevation: 8,
+      color: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(28),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -348,13 +377,21 @@ class _MedicinesPageState extends State<MedicinesPage> {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 24,
+                      color: Colors.black87,
+                      letterSpacing: 0.3,
                     ),
                   ),
                   const SizedBox(height: 5),
-                  Text("Godzina: $hour"),
+                  Text(
+                    "🕒 $hour",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   const SizedBox(height: 5),
                   Text(
                     status == "Przyjęto"
@@ -362,13 +399,14 @@ class _MedicinesPageState extends State<MedicinesPage> {
                         : status == "Do przyjęcia"
                             ? "🔴 Do przyjęcia"
                             : "🟡 Oczekuje",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: status == "Przyjęto"
                           ? Colors.green
                           : status == "Do przyjęcia"
                               ? Colors.red
                               : Colors.orange,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                 ],
@@ -377,12 +415,20 @@ class _MedicinesPageState extends State<MedicinesPage> {
             Column(
   children: [
     ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFE91E63),
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+      ),
       onPressed: medicine["taken"]
           ? null
           : () {
               setState(() {
                 medicine["taken"] = true;
               });
+              widget.saveMedicines();
             },
       child: Text(
         medicine["taken"]
@@ -413,6 +459,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
             setState(() {
               widget.medicines.remove(medicine);
             });
+            widget.saveMedicines();
           },
         ),
       ],
