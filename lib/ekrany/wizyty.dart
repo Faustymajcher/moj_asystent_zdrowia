@@ -19,7 +19,7 @@ class _WizytyPageState extends State<WizytyPage> {
   @override
   void initState() {
     super.initState();
-    load();
+    initDefaultVisit();
   }
 
   Future load() async {
@@ -29,6 +29,27 @@ class _WizytyPageState extends State<WizytyPage> {
 
   Future save() async {
     await storage.saveWizyty(wizyty);
+  }
+
+  Future initDefaultVisit() async {
+    final loaded = await storage.loadWizyty();
+
+    if (loaded.isEmpty) {
+      final defaultVisit = Wizyta(
+        id: DateTime.now().millisecondsSinceEpoch,
+        lekarz: "Dr Anna Kowalska",
+        miejsce: "Klinika Zdrowie, Kraków",
+        data: DateTime.now(),
+        notatki: "poprosić o receptę",
+      );
+
+      wizyty = [defaultVisit];
+      await save();
+    } else {
+      wizyty = loaded;
+    }
+
+    setState(() {});
   }
 
   void addVisit() {
