@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../modele/wizyta.dart';
-import '../baza danych/baza_danych.dart';
+import '../baza/baza_danych.dart';
 
 class Wizyty extends StatefulWidget {
   const Wizyty({super.key});

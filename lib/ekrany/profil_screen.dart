@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moj_asystent_zdrowia/baza danych/profile_storage.dart';
+import 'package:moj_asystent_zdrowia/baza/profile_storage.dart';
 import 'package:moj_asystent_zdrowia/modele/user_profile.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -55,10 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
     double water = 0.0;
 
     if (weight != null && age != null) {
-      water = calculateWaterIntake(
-        weight: weight,
-        age: age,
-      );
+      water = calculateWaterIntake(weight: weight, age: age);
     }
 
     await storage.saveWaterGoal(water);
@@ -89,11 +86,29 @@ class _ProfilePageState extends State<ProfilePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              TextField(controller: nameController, decoration: const InputDecoration(labelText: "Imię")),
-              TextField(controller: ageController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Wiek")),
-              TextField(controller: heightController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Wzrost")),
-              TextField(controller: weightController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Waga")),
-              TextField(controller: bloodController, decoration: const InputDecoration(labelText: "Grupa krwi")),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: "Imię"),
+              ),
+              TextField(
+                controller: ageController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: "Wiek"),
+              ),
+              TextField(
+                controller: heightController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: "Wzrost"),
+              ),
+              TextField(
+                controller: weightController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: "Waga"),
+              ),
+              TextField(
+                controller: bloodController,
+                decoration: const InputDecoration(labelText: "Grupa krwi"),
+              ),
 
               const SizedBox(height: 20),
 
