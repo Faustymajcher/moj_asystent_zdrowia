@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../modele/wizyta.dart';
-import '../baza/baza_danych.dart';
+import '../baza/wizyta_storage.dart';
 
 class WizytyPage extends StatefulWidget {
   const WizytyPage({super.key});
@@ -12,6 +12,8 @@ class WizytyPage extends StatefulWidget {
 }
 
 class _WizytyPageState extends State<WizytyPage> {
+  final storage = WizytaStorage();
+
   List<Wizyta> wizyty = [];
 
   @override
@@ -20,13 +22,14 @@ class _WizytyPageState extends State<WizytyPage> {
     load();
   }
 
-  Future<void> load() async {
-    wizyty = await BazaDanych.instance.pobierzWizyty();
+  Future load() async {
+    wizyty = await storage.loadWizyty();
     setState(() {});
   }
 
-  String format(DateTime d) =>
-      "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+  Future save() async {
+    await storage.saveWizyty(wizyty);
+  }
 
   void addVisit() {
     final lekarz = TextEditingController();
@@ -55,7 +58,6 @@ class _WizytyPageState extends State<WizytyPage> {
                   controller: notatki,
                   decoration: const InputDecoration(labelText: "Notatki"),
                 ),
-
                 const SizedBox(height: 10),
 
                 ElevatedButton(
@@ -74,7 +76,9 @@ class _WizytyPageState extends State<WizytyPage> {
                   child: const Text("Wybierz datę"),
                 ),
 
-                Text(data == null ? "Brak daty" : format(data!)),
+                Text(
+                  data == null ? "Brak daty" : data.toString().split(" ")[0],
+                ),
               ],
             ),
             actions: [
@@ -86,17 +90,20 @@ class _WizytyPageState extends State<WizytyPage> {
                 onPressed: () async {
                   if (data == null) return;
 
-                  await BazaDanych.instance.dodajWizyte(
-                    Wizyta(
-                      data: data!,
-                      lekarz: lekarz.text,
-                      miejsce: miejsce.text,
-                      notatki: notatki.text,
-                    ),
-                  );
+                  setState(() {
+                    wizyty.add(
+                      Wizyta(
+                        id: DateTime.now().millisecondsSinceEpoch,
+                        lekarz: lekarz.text,
+                        miejsce: miejsce.text,
+                        data: data!,
+                        notatki: notatki.text,
+                      ),
+                    );
+                  });
 
+                  await save();
                   Navigator.pop(context);
-                  load();
                 },
                 child: const Text("Dodaj"),
               ),
@@ -107,6 +114,15 @@ class _WizytyPageState extends State<WizytyPage> {
     );
   }
 
+  Future delete(int id) async {
+    wizyty.removeWhere((w) => w.id == id);
+    await save();
+    setState(() {});
+  }
+
+  String format(DateTime d) =>
+      "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,9 +131,8 @@ class _WizytyPageState extends State<WizytyPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFE91E63),
         foregroundColor: Colors.white,
-        centerTitle: true,
         title: Text(
-          "Wizyty",
+          "Moje wizyty",
           style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
         ),
       ),
@@ -153,12 +168,7 @@ class _WizytyPageState extends State<WizytyPage> {
                     isThreeLine: true,
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        if (w.id != null) {
-                          await BazaDanych.instance.usunWizyte(w.id!);
-                          load();
-                        }
-                      },
+                      onPressed: () => delete(w.id!),
                     ),
                   ),
                 );
