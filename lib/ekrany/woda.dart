@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../baza danych/baza_danych.dart';
+import '../baza/baza_danych.dart';
 import '../modele/woda_wpis.dart';
 
 class WaterPage extends StatefulWidget {
@@ -37,7 +37,7 @@ class _WaterPageState extends State<WaterPage> {
 
   Future<void> _loadSettingsAndData() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     // Waga i cel zostają w SharedPreferences (to ustawienia)
     setState(() {
       _weight = prefs.getDouble('user_weight') ?? 70.0;
@@ -56,13 +56,10 @@ class _WaterPageState extends State<WaterPage> {
 
   Future<void> _addWater(int amount) async {
     DateTime now = DateTime.now();
-    String godzina = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    String godzina =
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
 
-    final wpis = WodaWpis(
-      data: _todayDate,
-      godzina: godzina,
-      ilosc: amount,
-    );
+    final wpis = WodaWpis(data: _todayDate, godzina: godzina, ilosc: amount);
 
     await BazaDanych.instance.dodajWpisWody(wpis);
     _refreshDrinks();
@@ -79,7 +76,10 @@ class _WaterPageState extends State<WaterPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Dodaj inną ilość", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        title: Text(
+          "Dodaj inną ilość",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+        ),
         content: TextField(
           controller: amountController,
           keyboardType: TextInputType.number,
@@ -97,7 +97,7 @@ class _WaterPageState extends State<WaterPage> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFE91E63), // Kolor aplikacji
-              foregroundColor: Colors.white
+              foregroundColor: Colors.white,
             ),
             onPressed: () {
               int? amount = int.tryParse(amountController.text);
@@ -121,7 +121,10 @@ class _WaterPageState extends State<WaterPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF5F8), // Tło aplikacji
       appBar: AppBar(
-        title: Text("Nawodnienie", style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 32)),
+        title: Text(
+          "Nawodnienie",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 32),
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFFE91E63),
         foregroundColor: Colors.white,
@@ -142,18 +145,26 @@ class _WaterPageState extends State<WaterPage> {
                     value: progress,
                     strokeWidth: 15,
                     backgroundColor: const Color(0xFFE91E63).withOpacity(0.2),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFE91E63)),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Color(0xFFE91E63),
+                    ),
                   ),
                 ),
                 Column(
                   children: [
                     Text(
                       "$_drunkWater ml",
-                      style: GoogleFonts.poppins(fontSize: 26, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.poppins(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       "Cel: $_waterTarget ml",
-                      style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600]),
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
@@ -170,7 +181,9 @@ class _WaterPageState extends State<WaterPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE91E63),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
                 ElevatedButton.icon(
@@ -180,7 +193,9 @@ class _WaterPageState extends State<WaterPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC2185B), // Ciemniejszy róż
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
               ],
@@ -188,14 +203,25 @@ class _WaterPageState extends State<WaterPage> {
             TextButton.icon(
               onPressed: _showCustomWaterDialog,
               icon: const Icon(Icons.add, color: Color(0xFFE91E63)),
-              label: const Text("Dodaj inną ilość", style: TextStyle(color: Color(0xFFE91E63), fontWeight: FontWeight.bold, fontSize: 15)),
+              label: const Text(
+                "Dodaj inną ilość",
+                style: TextStyle(
+                  color: Color(0xFFE91E63),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
             ),
             const Divider(height: 30, thickness: 1.5),
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 "Dzisiejsze wpisy:",
-                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -204,7 +230,10 @@ class _WaterPageState extends State<WaterPage> {
                   ? Center(
                       child: Text(
                         "Jeszcze nic dzisiaj nie wypiłeś/aś.",
-                        style: TextStyle(color: Colors.grey[500], fontStyle: FontStyle.italic),
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
                     )
                   : ListView.builder(
@@ -215,16 +244,31 @@ class _WaterPageState extends State<WaterPage> {
                           elevation: 2,
                           color: Colors.white,
                           margin: const EdgeInsets.symmetric(vertical: 6),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           child: ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: const Color(0xFFE91E63).withOpacity(0.15),
-                              child: const Icon(Icons.water_drop, color: Color(0xFFE91E63)),
+                              backgroundColor: const Color(
+                                0xFFE91E63,
+                              ).withOpacity(0.15),
+                              child: const Icon(
+                                Icons.water_drop,
+                                color: Color(0xFFE91E63),
+                              ),
                             ),
-                            title: Text("${drink.ilosc} ml", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                            title: Text(
+                              "${drink.ilosc} ml",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             subtitle: Text("Dodano o: ${drink.godzina}"),
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline, color: Colors.red),
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                              ),
                               onPressed: () => _removeDrink(drink.id!),
                             ),
                           ),
